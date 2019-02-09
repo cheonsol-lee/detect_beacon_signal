@@ -18,7 +18,7 @@ import yg.devp.util.Useful;
 
 import static yg.devp.util.Useful.LOG_COMM_SERVER;
 
-/** 2019.2.9 22:41 깃허브 재연결*/
+/** 2019.2.9 22:41 깃허브 재연결2*/
 
 public class MainActivity extends BLEActivity {
 
