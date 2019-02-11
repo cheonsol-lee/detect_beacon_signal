@@ -38,11 +38,14 @@ public class BLEActivity extends AppCompatActivity {
 
     // Etc
     private int REQUEST_ENABLE_BT = 1;
-    private String beacon1MacAddress = "C2:01:19:00:03:AF"; // beacon1 ID
-    private String beacon2MacAddress = "C2:01:19:00:03:B0"; // beacon2 ID
-    private String beacon3MacAddress = "C2:01:19:00:03:B1"; // beacon3 ID
+    private String beacon1MacAddress = "F7:16:EF:05:86:47"; // beacon1 ID(lux beacon)
+    private String beacon2MacAddress = "C2:01:19:00:03:AF"; // beacon2 ID
+    private String beacon3MacAddress = "C2:01:19:00:03:B0"; // beacon3 ID
+    private String beacon4MacAddress = "C2:01:19:00:03:B1"; // beacon4 ID
     private String cellNumber = "0"; // cellNumber
     private static int buttonType = 0; // 1: reset, 2: query, 3: save, 4: learn
+    private static int modelType = 0;  // 5: modelA, 6: modelB
+
     private static int setNumber = 0; // beacon set's number
     private static int setNumberForLearning = 0; // beacon set's number
 
@@ -51,6 +54,8 @@ public class BLEActivity extends AppCompatActivity {
     private final static int BTN_QUERY = 2;
     private final static int BTN_SAVE  = 3;
     private final static int BTN_LEARN = 4;
+    private final static int BTN_MODEL_A = 5;
+    private final static int BTN_MODEL_B = 6;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,27 +142,43 @@ public class BLEActivity extends AppCompatActivity {
             final BluetoothDevice device = result.getDevice();
             Log.i("SCAN1", "[" + device.getName() + "], ByteArray:" + Useful.printByteArray(result.getScanRecord().getBytes()));
 
+            if (getModelType() == BTN_MODEL_A){
+               signalDTO.setModelName("model_a");
+            }
+            else if (getModelType() == BTN_MODEL_B){
+                signalDTO.setModelName("model_b");
+            }
+
+            //비콘신호값들 저장
             if (device.getAddress().equals(beacon1MacAddress)) {
                 signalDTO.setSignal1(result.getRssi());
-            } else if (device.getAddress().equals(beacon2MacAddress)) {
+            }
+            else if (device.getAddress().equals(beacon2MacAddress)) {
                 signalDTO.setSignal2(result.getRssi());
-            } else if (device.getAddress().equals(beacon3MacAddress)) {
+            }
+            else if (device.getAddress().equals(beacon3MacAddress)) {
                 signalDTO.setSignal3(result.getRssi());
+            }
+            else if (device.getAddress().equals(beacon4MacAddress)) {
+                signalDTO.setSignal4(result.getRssi());
             }
 
             // if you received all signals, then you access cnn4ips server
             if (signalDTO.isFull()) {
-                Log.i("beacon1", "[reco1]:" + signalDTO.getSignal1());
-                Log.i("beacon2", "[reco2]:" + signalDTO.getSignal2());
-                Log.i("beacon3", "[reco3]:" + signalDTO.getSignal3());
+                Log.i("beacon1", "[b1]:" + signalDTO.getSignal1());
+                Log.i("beacon2", "[b2]:" + signalDTO.getSignal2());
+                Log.i("beacon3", "[b3]:" + signalDTO.getSignal3());
+                Log.i("beacon4", "[b4]:" + signalDTO.getSignal4());
 
+                String modelName = signalDTO.getModelName();
                 int b1Rssi = signalDTO.getSignal1();
                 int b2Rssi = signalDTO.getSignal2();
                 int b3Rssi = signalDTO.getSignal3();
+                int b4Rssi = signalDTO.getSignal4();
 
 
-                String queryUrl = Useful.URL_QUERY + b1Rssi + "/" + b2Rssi + "/" + b3Rssi + "/";
-                String saveUrl = Useful.URL_SAVE + b1Rssi + "/" + b2Rssi + "/" + b3Rssi + "/" + cellNumber + "/" + setNumberForLearning + "/";
+                String queryUrl = Useful.URL_QUERY + modelName + "/" + b1Rssi + "/" + b2Rssi + "/" + b3Rssi + "/" + b4Rssi + "/";
+                String saveUrl = Useful.URL_SAVE + modelName + "/" + b1Rssi + "/" + b2Rssi + "/" + b3Rssi + "/" + b4Rssi +"/" + cellNumber + "/" + setNumberForLearning + "/";
                 String learnUrl = Useful.URL_LEARN + setNumberForLearning + "/";
 
                 signalDTO.empty();
@@ -197,6 +218,14 @@ public class BLEActivity extends AppCompatActivity {
         this.cellNumber = cellNumber;
         this.setNumber = setNumber;
         this.setNumberForLearning = setNumber;
+    }
+
+    protected void setModelType(int modelType){
+        this.modelType = modelType;
+    }
+
+    public static int getModelType() {
+        return modelType;
     }
 
     protected void setButtonType(int buttonType) {

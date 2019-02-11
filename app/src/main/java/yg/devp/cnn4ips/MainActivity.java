@@ -18,18 +18,26 @@ import yg.devp.util.Useful;
 
 import static yg.devp.util.Useful.LOG_COMM_SERVER;
 
-/** 2019.2.9 22:41 깃허브 재연결2*/
+/** 2019.2.12 01:45
+ *
+ * 수정사항 : 모델에 따른 버튼 추가(A,B), 비콘4개 입력(럭스비콘 추가)
+ *
+ */
+
 
 public class MainActivity extends BLEActivity {
 
     private static EditText edit_main_cell;
     private EditText edit_main_set;
-    private EditText edit_main_input; // 입력셀의 갯수
-    private EditText edit_main_output; // 출력셀의 갯수
+//    private EditText edit_main_input; // 입력셀의 갯수
+//    private EditText edit_main_output; // 출력셀의 갯수
     private Button btn_main_query;
     private Button btn_main_save;
     private Button btn_main_learn;
     private Button btn_main_reset;
+
+    private Button btn_model_a;
+    private Button btn_model_b;
 
     private static TextView textv_main_message;
     private static LinearLayout message_LinearLayout;
@@ -44,12 +52,15 @@ public class MainActivity extends BLEActivity {
     private static int correctCount = 0; // 맞은 횟수 카운트
     private static String accuracyPercent = null; // 정확도 확률(%)
     private static int responseCell = 0; // 응답으로 온 셀번호
+    private static String modelName; //모델명 입력
 
     //버튼을 상수화
     private final static int BTN_RESET = 1;
     private final static int BTN_QUERY = 2;
     private final static int BTN_SAVE  = 3;
     private final static int BTN_LEARN = 4;
+    private final static int BTN_MODEL_A = 5;
+    private final static int BTN_MODEL_B = 6;
 
 
     @Override
@@ -76,8 +87,8 @@ public class MainActivity extends BLEActivity {
     }
 
     private void initScreen() {
-        edit_main_input = findViewById(R.id.edit_main_input);
-        edit_main_output = findViewById(R.id.edit_main_output);
+//        edit_main_input = findViewById(R.id.edit_main_input);
+//        edit_main_output = findViewById(R.id.edit_main_output);
         edit_main_cell = findViewById(R.id.edit_main_cell);
         edit_main_set = findViewById(R.id.edit_main_set);
 
@@ -85,6 +96,10 @@ public class MainActivity extends BLEActivity {
         btn_main_query = findViewById(R.id.btn_main_query);
         btn_main_save = findViewById(R.id.btn_main_save);
         btn_main_learn = findViewById(R.id.btn_main_learn);
+
+        btn_model_a = findViewById(R.id.btn_model_a);
+        btn_model_b = findViewById(R.id.btn_model_b);
+
         message_LinearLayout = findViewById(R.id.message_LinearLayout);
         scrollView = findViewById(R.id.ScrollView);
         tv_main_accuracy = findViewById(R.id.tv_main_accuracy);
@@ -93,6 +108,9 @@ public class MainActivity extends BLEActivity {
         btn_main_query.setOnClickListener(clickListener);
         btn_main_save.setOnClickListener(clickListener);
         btn_main_learn.setOnClickListener(clickListener);
+
+        btn_model_a.setOnClickListener(clickListener);
+        btn_model_b.setOnClickListener(clickListener);
 
         mainActivityContext = this;
     }
@@ -113,12 +131,14 @@ public class MainActivity extends BLEActivity {
             switch (returnButtonType(v)){
 
                 case BTN_RESET:{
+                    setButtonType(BTN_RESET);
                     urlSendCount = 0; // url 전송갯수 초기화
                     correctCount = 0; // 정확도 갯수 초기화
                     tv_main_accuracy.setText("0%");
 
                     if ((message_LinearLayout).getChildCount() > 0)
                         (message_LinearLayout).removeAllViews();
+                    break;
                 }
 
                 case BTN_QUERY:{
@@ -128,9 +148,10 @@ public class MainActivity extends BLEActivity {
                     } else {
                         Toast.makeText(MainActivity.this, "Query : On", Toast.LENGTH_SHORT).show();
                         toggle = true;
-                        setButtonType(1); // 1 : query button
+                        setButtonType(BTN_QUERY);
                     }
                     scanLeDevice(toggle);
+                    break;
                 }
 
                 case BTN_SAVE :{
@@ -154,13 +175,28 @@ public class MainActivity extends BLEActivity {
                         // cell번호가 0이 아닐때만 스캔 진행
                         scanLeDevice(toggle);
                     }
+                    break;
                 }
 
                 case BTN_LEARN:{
+                    setButtonType(BTN_LEARN);
                     Toast.makeText(MainActivity.this, "Learning Start", Toast.LENGTH_SHORT).show();
                     int setNumberForLearning = Integer.parseInt(edit_main_set.getText().toString());
                     String learnUrl = Useful.URL_LEARN + setNumberForLearning + "/";
                     new CNN4IPSNetworkTask(learnUrl, null).execute();
+                    break;
+                }
+
+                case BTN_MODEL_A:{
+                    modelName = "model_a";
+                    setModelType(BTN_MODEL_A);
+                    break;
+                }
+
+                case BTN_MODEL_B:{
+                    modelName = "model_b";
+                    setModelType(BTN_MODEL_B);
+                    break;
                 }
             }
 
