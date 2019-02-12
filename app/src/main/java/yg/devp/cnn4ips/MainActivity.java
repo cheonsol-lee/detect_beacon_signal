@@ -2,9 +2,11 @@ package yg.devp.cnn4ips;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,9 +20,9 @@ import yg.devp.util.Useful;
 
 import static yg.devp.util.Useful.LOG_COMM_SERVER;
 
-/** 2019.2.12 01:45
+/** 2019.2.12 20:02
  *
- * 수정사항 : 모델에 따른 버튼 추가(A,B), 비콘4개 입력(럭스비콘 추가)
+ * 수정사항 : 모델버튼을 누르면 색상 변경 & 유지보수
  *
  */
 
@@ -52,7 +54,6 @@ public class MainActivity extends BLEActivity {
     private static int correctCount = 0; // 맞은 횟수 카운트
     private static String accuracyPercent = null; // 정확도 확률(%)
     private static int responseCell = 0; // 응답으로 온 셀번호
-    private static String modelName; //모델명 입력
 
     //버튼을 상수화
     private final static int BTN_RESET = 1;
@@ -104,24 +105,74 @@ public class MainActivity extends BLEActivity {
         scrollView = findViewById(R.id.ScrollView);
         tv_main_accuracy = findViewById(R.id.tv_main_accuracy);
 
+        // clickListener
         btn_main_reset.setOnClickListener(clickListener);
         btn_main_query.setOnClickListener(clickListener);
         btn_main_save.setOnClickListener(clickListener);
         btn_main_learn.setOnClickListener(clickListener);
-
         btn_model_a.setOnClickListener(clickListener);
         btn_model_b.setOnClickListener(clickListener);
+
+        defaultButtonColor();
 
         mainActivityContext = this;
     }
 
     // 버튼타입에 따라 정수형으로 리턴
     private int returnButtonType(View v){
-        if(v == btn_main_reset)      return BTN_RESET;
+        if     (v == btn_main_reset) return BTN_RESET;
         else if(v == btn_main_query) return BTN_QUERY;
         else if(v == btn_main_save ) return BTN_SAVE;
-        else                         return BTN_LEARN;
+        else if(v == btn_main_learn) return BTN_LEARN;
+        else if(v == btn_model_a)    return BTN_MODEL_A;
+        else                         return BTN_MODEL_B;
     }
+
+    // button color default
+    private void defaultButtonColor(){
+        btn_main_reset.setBackgroundColor(Color.GRAY);
+        btn_main_query.setBackgroundColor(Color.GRAY);
+        btn_main_save.setBackgroundColor(Color.GRAY);
+        btn_main_learn.setBackgroundColor(Color.GRAY);
+        btn_model_a.setBackgroundColor(Color.GRAY);
+        btn_model_b.setBackgroundColor(Color.GRAY);
+    }
+
+    // button color setting
+    private void setButtonColor(View view){
+       defaultButtonColor();
+        if(getModelType() == 5){
+            btn_model_a.setBackgroundColor(Color.RED);
+        }
+
+        if(getModelType() == 6){
+            btn_model_b.setBackgroundColor(Color.RED);
+        }
+
+        switch(returnButtonType(view)){
+            case BTN_RESET:{
+                btn_main_reset.setBackgroundColor(Color.RED);
+                break;
+            }
+
+            case BTN_QUERY:{
+                btn_main_query.setBackgroundColor(Color.RED);
+                break;
+            }
+
+            case BTN_SAVE:{
+                btn_main_save.setBackgroundColor(Color.RED);
+                break;
+            }
+
+            case BTN_LEARN:{
+                btn_main_learn.setBackgroundColor(Color.RED);
+                break;
+            }
+        }
+    }
+
+
 
     private View.OnClickListener clickListener = new View.OnClickListener() {
 
@@ -131,6 +182,9 @@ public class MainActivity extends BLEActivity {
             switch (returnButtonType(v)){
 
                 case BTN_RESET:{
+                    setButtonColor(v);
+
+                    btn_main_reset.setBackgroundColor(Color.RED);
                     setButtonType(BTN_RESET);
                     urlSendCount = 0; // url 전송갯수 초기화
                     correctCount = 0; // 정확도 갯수 초기화
@@ -142,6 +196,8 @@ public class MainActivity extends BLEActivity {
                 }
 
                 case BTN_QUERY:{
+                    setButtonColor(v);
+
                     if (toggle) {
                         Toast.makeText(MainActivity.this, "Query : Off", Toast.LENGTH_SHORT).show();
                         toggle = false;
@@ -149,12 +205,15 @@ public class MainActivity extends BLEActivity {
                         Toast.makeText(MainActivity.this, "Query : On", Toast.LENGTH_SHORT).show();
                         toggle = true;
                         setButtonType(BTN_QUERY);
+                        Log.i("BTN_QUERY", String.valueOf(getButtonType()));
                     }
                     scanLeDevice(toggle);
                     break;
                 }
 
                 case BTN_SAVE :{
+                    setButtonColor(v);
+
                     if (toggle) {
                         Toast.makeText(MainActivity.this, "Save : Off", Toast.LENGTH_SHORT).show();
                         toggle = false;
@@ -165,6 +224,7 @@ public class MainActivity extends BLEActivity {
                         int setNumber = Integer.parseInt(edit_main_set.getText().toString());
 
                         setButtonType(BTN_SAVE);
+                        Log.i("BTN_SAVE", String.valueOf(getButtonType()));
                         setCellandSetNumber(cellNumber, setNumber);
                     }
 
@@ -175,27 +235,38 @@ public class MainActivity extends BLEActivity {
                         // cell번호가 0이 아닐때만 스캔 진행
                         scanLeDevice(toggle);
                     }
+
                     break;
                 }
 
                 case BTN_LEARN:{
+                    setButtonColor(v);
+
                     setButtonType(BTN_LEARN);
+                    Log.i("BTN_LEARN", String.valueOf(getButtonType()));
                     Toast.makeText(MainActivity.this, "Learning Start", Toast.LENGTH_SHORT).show();
+
+                    int modelNumber = getModelType();
+
                     int setNumberForLearning = Integer.parseInt(edit_main_set.getText().toString());
-                    String learnUrl = Useful.URL_LEARN + setNumberForLearning + "/";
+                    String learnUrl = Useful.URL_LEARN + modelNumber + "/" + setNumberForLearning + "/";
                     new CNN4IPSNetworkTask(learnUrl, null).execute();
                     break;
                 }
 
                 case BTN_MODEL_A:{
-                    modelName = "model_a";
                     setModelType(BTN_MODEL_A);
+                    setButtonColor(v);
+                    Toast.makeText(MainActivity.this,"Model A selected!",Toast.LENGTH_SHORT).show();
+
                     break;
                 }
 
                 case BTN_MODEL_B:{
-                    modelName = "model_b";
                     setModelType(BTN_MODEL_B);
+                    setButtonColor(v);
+                    Toast.makeText(MainActivity.this,"Model B selected!",Toast.LENGTH_SHORT).show();
+
                     break;
                 }
             }

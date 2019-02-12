@@ -39,9 +39,9 @@ public class BLEActivity extends AppCompatActivity {
     // Etc
     private int REQUEST_ENABLE_BT = 1;
     private String beacon1MacAddress = "F7:16:EF:05:86:47"; // beacon1 ID(lux beacon)
-    private String beacon2MacAddress = "C2:01:19:00:03:AF"; // beacon2 ID
-    private String beacon3MacAddress = "C2:01:19:00:03:B0"; // beacon3 ID
-    private String beacon4MacAddress = "C2:01:19:00:03:B1"; // beacon4 ID
+    private String beacon2MacAddress = "C2:01:19:00:03:B9"; // beacon2 ID(19753)
+    private String beacon3MacAddress = "C2:01:19:00:03:BC"; // beacon3 ID(19756)
+    private String beacon4MacAddress = "C2:01:19:00:03:BD"; // beacon4 ID(19757)
     private String cellNumber = "0"; // cellNumber
     private static int buttonType = 0; // 1: reset, 2: query, 3: save, 4: learn
     private static int modelType = 0;  // 5: modelA, 6: modelB
@@ -143,10 +143,10 @@ public class BLEActivity extends AppCompatActivity {
             Log.i("SCAN1", "[" + device.getName() + "], ByteArray:" + Useful.printByteArray(result.getScanRecord().getBytes()));
 
             if (getModelType() == BTN_MODEL_A){
-               signalDTO.setModelName("model_a");
+               signalDTO.setModelName(5);
             }
             else if (getModelType() == BTN_MODEL_B){
-                signalDTO.setModelName("model_b");
+                signalDTO.setModelName(6);
             }
 
             //비콘신호값들 저장
@@ -165,12 +165,13 @@ public class BLEActivity extends AppCompatActivity {
 
             // if you received all signals, then you access cnn4ips server
             if (signalDTO.isFull()) {
+                Log.i("model_Name", "[model]:" + signalDTO.getModelName());
                 Log.i("beacon1", "[b1]:" + signalDTO.getSignal1());
                 Log.i("beacon2", "[b2]:" + signalDTO.getSignal2());
                 Log.i("beacon3", "[b3]:" + signalDTO.getSignal3());
                 Log.i("beacon4", "[b4]:" + signalDTO.getSignal4());
 
-                String modelName = signalDTO.getModelName();
+                int modelName = signalDTO.getModelName();
                 int b1Rssi = signalDTO.getSignal1();
                 int b2Rssi = signalDTO.getSignal2();
                 int b3Rssi = signalDTO.getSignal3();
@@ -178,8 +179,10 @@ public class BLEActivity extends AppCompatActivity {
 
 
                 String queryUrl = Useful.URL_QUERY + modelName + "/" + b1Rssi + "/" + b2Rssi + "/" + b3Rssi + "/" + b4Rssi + "/";
+                Log.i("QueryUrl", queryUrl);
+                Log.i("ModelName", String.valueOf(modelName));
                 String saveUrl = Useful.URL_SAVE + modelName + "/" + b1Rssi + "/" + b2Rssi + "/" + b3Rssi + "/" + b4Rssi +"/" + cellNumber + "/" + setNumberForLearning + "/";
-                String learnUrl = Useful.URL_LEARN + setNumberForLearning + "/";
+                String learnUrl = Useful.URL_LEARN + modelName + "/" + setNumberForLearning + "/";
 
                 signalDTO.empty();
 
