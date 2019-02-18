@@ -20,9 +20,9 @@ import yg.devp.util.Useful;
 
 import static yg.devp.util.Useful.LOG_COMM_SERVER;
 
-/** 2019.2.12 20:02
+/** 2019.2.18 17:56
  *
- * 수정사항 : 모델버튼을 누르면 색상 변경 & 유지보수
+ * 수정사항 : 노트북 재연결
  *
  */
 
