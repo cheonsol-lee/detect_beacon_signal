@@ -20,9 +20,9 @@ import yg.devp.util.Useful;
 
 import static yg.devp.util.Useful.LOG_COMM_SERVER;
 
-/** 2019.2.18 17:56
+/** 2019.3.04 16:00
  *
- * 수정사항 : 노트북 재연결.
+ * 수정사항 : 비콘 3개로 수정.
  *
  */
 
@@ -31,7 +31,7 @@ public class MainActivity extends BLEActivity {
 
     private static EditText edit_main_cell;
     private EditText edit_main_set;
-//    private EditText edit_main_input; // 입력셀의 갯수
+    //    private EditText edit_main_input; // 입력셀의 갯수
 //    private EditText edit_main_output; // 출력셀의 갯수
     private Button btn_main_query;
     private Button btn_main_save;
@@ -140,7 +140,7 @@ public class MainActivity extends BLEActivity {
 
     // button color setting
     private void setButtonColor(View view){
-       defaultButtonColor();
+        defaultButtonColor();
         if(getModelType() == 5){
             btn_model_a.setBackgroundColor(Color.RED);
         }

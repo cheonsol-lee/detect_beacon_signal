@@ -5,14 +5,14 @@ public class SignalDTO {
     private int signal1;
     private int signal2;
     private int signal3;
-    private int signal4;
+//    private int signal4;
 
     public SignalDTO() {
         this.modelName = 0;
         this.signal1 = 0;
         this.signal2 = 0;
         this.signal3 = 0;
-        this.signal4 = 0;
+//        this.signal4 = 0;
     }
 
     public int getModelName() {
@@ -23,13 +23,13 @@ public class SignalDTO {
         this.modelName = modelName;
     }
 
-    public int getSignal4() {
-        return signal4;
-    }
-
-    public void setSignal4(int signal4) {
-        this.signal4 = signal4;
-    }
+//    public int getSignal4() {
+//        return signal4;
+//    }
+//
+//    public void setSignal4(int signal4) {
+//        this.signal4 = signal4;
+//    }
 
     public int getSignal1() {
         return signal1;
@@ -56,7 +56,7 @@ public class SignalDTO {
     }
 
     public boolean isFull() {
-        return (this.signal1 != 0 && this.signal2 != 0 && this.signal3 != 0 && this.signal4 != 0);
+        return (this.signal1 != 0 && this.signal2 != 0 && this.signal3 != 0);
     }
 
     public void empty(){
@@ -64,6 +64,6 @@ public class SignalDTO {
         this.signal1 = 0;
         this.signal2 = 0;
         this.signal3 = 0;
-        this.signal4 = 0;
+//        this.signal4 = 0;
     }
 }
