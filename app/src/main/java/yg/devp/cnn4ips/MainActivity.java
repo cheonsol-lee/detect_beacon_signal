@@ -22,7 +22,7 @@ import static yg.devp.util.Useful.LOG_COMM_SERVER;
 
 /** 2019.2.18 17:56
  *
- * 수정사항 : 노트북 재연결
+ * 수정사항 : 노트북 재연결.
  *
  */
 
